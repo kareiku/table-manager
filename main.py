@@ -10,7 +10,7 @@ COLOR = "#004490"
 
 current_sort_order = True
 
-class ExcelApp:
+class Main:
     def __init__(self):
         self.root = Tk()
         self.root.state('zoomed')
@@ -97,19 +97,19 @@ class ExcelApp:
 
                 Button(sheet_selection_dialog, text="Cargar", command=load_selected_sheet).grid(column=1, row=0)
 
-            except Exception as e:
-                print(f"Exception found: {e}")
+            except Exception as ex:
+                pass
 
     def load_data_sheet(self, file_path, sheetname):
         try:
             df = read_excel(file_path, sheet_name=sheetname)
             self.df = df.astype(str)
             self.update_table()
-        except Exception as e:
-            print(f"Exception found: {e}")
+        except Exception as ex:
+            pass
 
     def update_table(self):
-        if self.df is not None:
+        if self.df:
             self.df = self.df.replace({'nan': "", 'NaT': ""})
 
             for column in self.df.columns:
@@ -151,7 +151,7 @@ class ExcelApp:
         filter_text = self.filter_var.get()
         second_filter_text = self.second_filter_var.get()
 
-        if self.df is not None and (filter_text or second_filter_text):
+        if self.df and (filter_text or second_filter_text):
             selected_column = self.first_column_var.get()
             second_selected_column = self.second_column_var.get()
 
@@ -171,14 +171,14 @@ class ExcelApp:
     def sort_table(self):
         global current_sort_order
 
-        if self.df is not None:
+        if self.df:
             selected_column = self.sort_var.get()
             filter_text = self.filter_var.get()
             second_filter_text = self.second_filter_var.get()
 
             if selected_column:
                 if filter_text or second_filter_text:
-                    if self.filtered_df is not None and not self.filtered_df.empty:
+                    if self.filtered_df and not self.filtered_df.empty:
                         self.filtered_df.sort_values(by=selected_column, ascending=current_sort_order, inplace=True)
                         current_sort_order = not current_sort_order
                         sorted_data = self.filtered_df.values.tolist()
@@ -195,7 +195,7 @@ class ExcelApp:
                     self.sheet.set_sheet_data(sorted_data, reset_col_positions=True)
 
     def export_filtered_data(self):
-        if self.df is not None:
+        if self.df:
             filter_text = self.filter_var.get()
             second_filter_text = self.second_filter_var.get()
             selected_column = self.first_column_var.get()
@@ -217,9 +217,9 @@ class ExcelApp:
                 if file_path:
                     self.df.to_excel(file_path, index=False)
 
-    def run(self):
+    def start(self):
         self.root.mainloop()
 
 
 if __name__ == "__main__":
-    ExcelApp().run()
+    Main().start()
