@@ -1,5 +1,5 @@
 import sys
-sys.path.append("./modules")
+sys.path.insert(0, "./modules")
 
 import pandas
 from tkinter import filedialog
