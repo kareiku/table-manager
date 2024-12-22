@@ -2,6 +2,8 @@ package org.example.tablemanager;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
@@ -15,28 +17,27 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) {
-        try {
-            GridPane root = new GridPane();
+        Image icon = new Image(Objects.requireNonNull(getClass().getResourceAsStream(ICON_PATH)));
 
-            root.setMinSize(500, 300);
-            stage.setTitle(LANG.get(0));
-            stage.setMaximized(true);
-            Image icon = new Image(Objects.requireNonNull(getClass().getResourceAsStream(ICON_PATH)));
-            stage.getIcons().add(icon);
+        stage.setTitle(LANG.get(Language.Key.Title));
+        stage.getIcons().add(icon);
+        stage.setMaximized(true);
+        stage.setResizable(true);
 
-            Scene scene = new Scene(root, 320, 240);
-            stage.setScene(scene);
-            stage.show();
-        } catch (Exception ex) {
-            assert false : ex.getMessage();
-        }
+        GridPane root = new GridPane();
+        root.setMinSize(500, 300);
+
+        Label label = new Label("test");
+        root.getChildren().add(label);
+        Button exitButton = new Button(LANG.get(Language.Key.Exit));
+        root.getChildren().add(exitButton);
+
+        Scene scene = new Scene(root);
+        stage.setScene(scene);
+        stage.show();
     }
 
     public static void main(String[] args) {
-        try {
-            launch();
-        } catch (Exception ex) {
-            assert false : ex.getMessage();
-        }
+        launch();
     }
 }
