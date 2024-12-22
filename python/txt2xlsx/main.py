@@ -1,6 +1,3 @@
-import sys
-sys.path.insert(0, "./modules")
-
 import pandas
 from tkinter import filedialog
 import os

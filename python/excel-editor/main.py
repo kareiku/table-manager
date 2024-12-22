@@ -1,6 +1,3 @@
-import sys
-sys.path.insert(0, "./modules")
-
 from tkinter import Tk, PhotoImage, filedialog, Toplevel, StringVar, Menu, Frame
 from tkinter.ttk import OptionMenu, Button, Entry, Style, Label
 from tkinter.font import Font
