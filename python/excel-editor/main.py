@@ -13,7 +13,6 @@ current_sort_order = True
 class Main:
     def __init__(self):
         self.root = Tk()
-        self.root.state('zoomed')
         self.root.resizable(True, True)
         self.root.minsize(500, 300)
         self.root.title("Visualizador Excel")
