@@ -10,7 +10,7 @@ import java.util.Objects;
 
 public class Main extends Application {
     private static final Language LANG = Language.en_US;
-    private static final String ICON_PATH = "icon.png";
+    private static final String ICON_PATH = "/icon.png";
     private static final String COLOR = "#004490";
 
     @Override
