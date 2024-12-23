@@ -108,15 +108,14 @@ public class TableManager extends Application {
                 }
 
                 ChoiceDialog<String> sheetDialog = new ChoiceDialog<>(sheetNames.get(0), sheetNames);
-                sheetDialog.setTitle(LANG.get(Language.Key.SheetSelection));
+                sheetDialog.setTitle(LANG.get(Language.Key.Title));
                 sheetDialog.setHeaderText(null);
                 sheetDialog.setContentText(LANG.get(Language.Key.SelectSheet));
 
                 Optional<String> result = sheetDialog.showAndWait();
                 result.ifPresent(sheetName -> loadSheet(workbook.getSheet(sheetName)));
-
             } catch (IOException e) {
-                showAlert("No se pudo abrir el archivo.");
+                showAlert(LANG.get(Language.Key.OpenError));
             }
         }
     }
@@ -198,7 +197,7 @@ public class TableManager extends Application {
         String column = sortColumn.getValue();
         if (column == null) return;
 
-        data.sort(Comparator.comparing(row -> row.getOrDefault(column, ""), Comparator.nullsFirst(String::compareTo)));
+        data.sort(Comparator.comparing(row -> row.getOrDefault(column, ""), Comparator.nullsLast(String::compareTo)));
         if (!sortAscending) Collections.reverse(data);
         sortAscending = !sortAscending;
 
@@ -235,14 +234,14 @@ public class TableManager extends Application {
                 }
 
             } catch (IOException e) {
-                showAlert("No se pudo exportar el archivo.");
+                showAlert(LANG.get(Language.Key.ExportError));
             }
         }
     }
 
     private void showAlert(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Error");
+        alert.setTitle(LANG.get(Language.Key.Title));
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();

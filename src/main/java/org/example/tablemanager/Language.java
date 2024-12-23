@@ -14,7 +14,9 @@ public enum Language {
             Map.entry(Key.SortPlaceholder, "Order by..."),
             Map.entry(Key.SelectFile, "Select a file"),
             Map.entry(Key.ExcelFiles, "Excel files"),
-            Map.entry(Key.SheetSelection,"")
+            Map.entry(Key.SelectSheet, "Select a sheet"),
+            Map.entry(Key.OpenError, "Error when opening selected file."),
+            Map.entry(Key.ExportError, "Error when exporting selection.")
     )),
     es_ES(Map.ofEntries(
             Map.entry(Key.Title, "Gestor de tablas Excel"),
@@ -26,7 +28,10 @@ public enum Language {
             Map.entry(Key.FilterPlaceholder, "Filtrar por..."),
             Map.entry(Key.SortPlaceholder, "Ordenar por..."),
             Map.entry(Key.SelectFile, "Seleccione un archivo"),
-            Map.entry(Key.ExcelFiles, "Archivos Excel")
+            Map.entry(Key.ExcelFiles, "Archivos Excel"),
+            Map.entry(Key.SelectSheet, "Seleccione una hoja"),
+            Map.entry(Key.OpenError, "Error al abrir el archivo seleccionado."),
+            Map.entry(Key.ExportError, "Error al exportar la selección.")
     ));
 
     private final Map<Key, String> messages;
@@ -50,7 +55,8 @@ public enum Language {
         SortPlaceholder,
         SelectFile,
         ExcelFiles,
-        SheetSelection,
-        SelectSheet
+        SelectSheet,
+        OpenError,
+        ExportError
     }
 }
