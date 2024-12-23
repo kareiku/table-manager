@@ -67,26 +67,32 @@ public class TableManager extends Application {
 
         this.firstColumnFilter = new ComboBox<>();
         this.firstColumnFilter.setPromptText(LANG.get(Language.Key.ColumnSelectPlaceholder));
+        this.firstColumnFilter.setMaxWidth(140);
 
         this.firstFilterField = new TextField();
         this.firstFilterField.setPromptText(LANG.get(Language.Key.FilterPlaceholder));
+        this.firstFilterField.setMaxWidth(150);
         this.firstFilterField.textProperty().addListener((ignored0, ignored1, ignored2) -> this.filterTable());
 
         this.secondColumnFilter = new ComboBox<>();
         this.secondColumnFilter.setPromptText(LANG.get(Language.Key.ColumnSelectPlaceholder));
+        this.secondColumnFilter.setMaxWidth(140);
 
         this.secondFilterField = new TextField();
         this.secondFilterField.setPromptText(LANG.get(Language.Key.FilterPlaceholder));
+        this.secondFilterField.setMaxWidth(150);
         this.secondFilterField.textProperty().addListener((ignored0, ignored1, ignored2) -> this.filterTable());
 
         this.sortColumn = new ComboBox<>();
         this.sortColumn.setPromptText(LANG.get(Language.Key.SortPlaceholder));
+        this.sortColumn.setMaxWidth(130);
         this.sortColumn.setOnAction(ignored -> this.sortTable());
 
         controls.getChildren().addAll(this.firstColumnFilter, this.firstFilterField, this.secondColumnFilter, this.secondFilterField, this.sortColumn);
         root.setCenter(controls);
 
         this.tableView = new TableView<>();
+        this.tableView.setPrefHeight(960);
         root.setBottom(this.tableView);
 
         Scene scene = new Scene(root, 800, 600);
@@ -232,7 +238,6 @@ public class TableManager extends Application {
                 try (FileOutputStream fos = new FileOutputStream(file)) {
                     workbook.write(fos);
                 }
-
             } catch (IOException e) {
                 this.showAlert(LANG.get(Language.Key.ExportError));
             }
