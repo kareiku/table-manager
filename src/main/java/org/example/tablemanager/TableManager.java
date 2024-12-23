@@ -116,7 +116,7 @@ public class TableManager extends Application {
                 result.ifPresent(sheetName -> loadSheet(workbook.getSheet(sheetName)));
 
             } catch (IOException e) {
-                showAlert("Error", "No se pudo abrir el archivo.");
+                showAlert("No se pudo abrir el archivo.");
             }
         }
     }
@@ -215,14 +215,12 @@ public class TableManager extends Application {
             try (Workbook workbook = new XSSFWorkbook()) {
                 Sheet sheet = workbook.createSheet("Datos Filtrados");
 
-                // Write headers
                 Row headerRow = sheet.createRow(0);
                 List<String> headers = new ArrayList<>(data.get(0).keySet());
                 for (int i = 0; i < headers.size(); i++) {
                     headerRow.createCell(i).setCellValue(headers.get(i));
                 }
 
-                // Write data
                 List<Map<String, String>> tableData = tableView.getItems();
                 for (int i = 0; i < tableData.size(); i++) {
                     Row row = sheet.createRow(i + 1);
@@ -237,14 +235,14 @@ public class TableManager extends Application {
                 }
 
             } catch (IOException e) {
-                showAlert("Error", "No se pudo exportar el archivo.");
+                showAlert("No se pudo exportar el archivo.");
             }
         }
     }
 
-    private void showAlert(String title, String message) {
+    private void showAlert(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
+        alert.setTitle("Error");
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
