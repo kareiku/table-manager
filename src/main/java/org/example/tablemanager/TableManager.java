@@ -206,13 +206,13 @@ public class TableManager extends Application {
 
     private void exportFilteredData(Stage stage) {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Guardar archivo");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Archivos Excel", "*.xlsx"));
+        fileChooser.setTitle(LANG.get(Language.Key.SaveFile));
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(LANG.get(Language.Key.ExcelFiles), "*.xlsx"));
 
         File file = fileChooser.showSaveDialog(stage);
         if (file != null) {
             try (Workbook workbook = new XSSFWorkbook()) {
-                Sheet sheet = workbook.createSheet("Datos Filtrados");
+                Sheet sheet = workbook.createSheet(LANG.get(Language.Key.FilteredDataSheetName));
 
                 Row headerRow = sheet.createRow(0);
                 List<String> headers = new ArrayList<>(data.get(0).keySet());
