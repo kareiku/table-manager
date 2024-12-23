@@ -47,10 +47,10 @@ public class TableManager extends Application {
         BorderPane root = new BorderPane();
 
         MenuItem openItem = new MenuItem(LANG.get(Language.Key.OpenFile));
-        openItem.setOnAction(ignored -> openFile(stage));
+        openItem.setOnAction(ignored -> this.openFile(stage));
 
         MenuItem exportItem = new MenuItem(LANG.get(Language.Key.ExportFile));
-        exportItem.setOnAction(ignored -> exportFilteredData(stage));
+        exportItem.setOnAction(ignored -> this.exportFilteredData(stage));
 
         MenuItem exitItem = new MenuItem(LANG.get(Language.Key.Exit));
         exitItem.setOnAction(ignored -> System.exit(0));
@@ -65,29 +65,29 @@ public class TableManager extends Application {
         HBox controls = new HBox(10);
         controls.setPadding(new Insets(10));
 
-        firstColumnFilter = new ComboBox<>();
-        firstColumnFilter.setPromptText(LANG.get(Language.Key.ColumnSelectPlaceholder));
+        this.firstColumnFilter = new ComboBox<>();
+        this.firstColumnFilter.setPromptText(LANG.get(Language.Key.ColumnSelectPlaceholder));
 
-        firstFilterField = new TextField();
-        firstFilterField.setPromptText(LANG.get(Language.Key.FilterPlaceholder));
-        firstFilterField.textProperty().addListener((ignored0, ignored1, ignored2) -> filterTable());
+        this.firstFilterField = new TextField();
+        this.firstFilterField.setPromptText(LANG.get(Language.Key.FilterPlaceholder));
+        this.firstFilterField.textProperty().addListener((ignored0, ignored1, ignored2) -> this.filterTable());
 
-        secondColumnFilter = new ComboBox<>();
-        secondColumnFilter.setPromptText(LANG.get(Language.Key.ColumnSelectPlaceholder));
+        this.secondColumnFilter = new ComboBox<>();
+        this.secondColumnFilter.setPromptText(LANG.get(Language.Key.ColumnSelectPlaceholder));
 
-        secondFilterField = new TextField();
-        secondFilterField.setPromptText(LANG.get(Language.Key.FilterPlaceholder));
-        secondFilterField.textProperty().addListener((ignored0, ignored1, ignored2) -> filterTable());
+        this.secondFilterField = new TextField();
+        this.secondFilterField.setPromptText(LANG.get(Language.Key.FilterPlaceholder));
+        this.secondFilterField.textProperty().addListener((ignored0, ignored1, ignored2) -> this.filterTable());
 
-        sortColumn = new ComboBox<>();
-        sortColumn.setPromptText(LANG.get(Language.Key.SortPlaceholder));
-        sortColumn.setOnAction(ignored -> sortTable());
+        this.sortColumn = new ComboBox<>();
+        this.sortColumn.setPromptText(LANG.get(Language.Key.SortPlaceholder));
+        this.sortColumn.setOnAction(ignored -> this.sortTable());
 
-        controls.getChildren().addAll(firstColumnFilter, firstFilterField, secondColumnFilter, secondFilterField, sortColumn);
+        controls.getChildren().addAll(this.firstColumnFilter, this.firstFilterField, this.secondColumnFilter, this.secondFilterField, this.sortColumn);
         root.setCenter(controls);
 
-        tableView = new TableView<>();
-        root.setBottom(tableView);
+        this.tableView = new TableView<>();
+        root.setBottom(this.tableView);
 
         Scene scene = new Scene(root, 800, 600);
         stage.setScene(scene);
@@ -113,16 +113,16 @@ public class TableManager extends Application {
                 sheetDialog.setContentText(LANG.get(Language.Key.SelectSheet));
 
                 Optional<String> result = sheetDialog.showAndWait();
-                result.ifPresent(sheetName -> loadSheet(workbook.getSheet(sheetName)));
+                result.ifPresent(sheetName -> this.loadSheet(workbook.getSheet(sheetName)));
             } catch (IOException e) {
-                showAlert(LANG.get(Language.Key.OpenError));
+                this.showAlert(LANG.get(Language.Key.OpenError));
             }
         }
     }
 
     private void loadSheet(Sheet sheet) {
-        data = new ArrayList<>();
-        tableView.getColumns().clear();
+        this.data = new ArrayList<>();
+        this.tableView.getColumns().clear();
 
         Row headerRow = sheet.getRow(0);
         if (headerRow == null) return;
@@ -133,7 +133,7 @@ public class TableManager extends Application {
             headers.add(header);
             TableColumn<Map<String, String>, String> column = new TableColumn<>(header);
             column.setCellValueFactory(new PropertyValueFactory<>(header));
-            tableView.getColumns().add(column);
+            this.tableView.getColumns().add(column);
         }
 
         for (int i = 1; i <= sheet.getLastRowNum(); i++) {
@@ -142,18 +142,18 @@ public class TableManager extends Application {
                 Map<String, String> rowData = new HashMap<>();
                 for (int j = 0; j < headers.size(); j++) {
                     Cell cell = row.getCell(j);
-                    String value = getCellValue(cell);
+                    String value = this.getCellValue(cell);
                     rowData.put(headers.get(j), value);
                 }
-                data.add(rowData);
+                this.data.add(rowData);
             }
         }
 
-        tableView.setItems(FXCollections.observableArrayList(data));
+        this.tableView.setItems(FXCollections.observableArrayList(this.data));
 
-        firstColumnFilter.setItems(FXCollections.observableArrayList(headers));
-        secondColumnFilter.setItems(FXCollections.observableArrayList(headers));
-        sortColumn.setItems(FXCollections.observableArrayList(headers));
+        this.firstColumnFilter.setItems(FXCollections.observableArrayList(headers));
+        this.secondColumnFilter.setItems(FXCollections.observableArrayList(headers));
+        this.sortColumn.setItems(FXCollections.observableArrayList(headers));
     }
 
     private String getCellValue(Cell cell) {
@@ -169,15 +169,15 @@ public class TableManager extends Application {
     }
 
     private void filterTable() {
-        if (data == null) return;
+        if (this.data == null) return;
 
-        String filter1 = firstFilterField.getText().toLowerCase();
-        String column1 = firstColumnFilter.getValue();
+        String filter1 = this.firstFilterField.getText().toLowerCase();
+        String column1 = this.firstColumnFilter.getValue();
 
-        String filter2 = secondFilterField.getText().toLowerCase();
-        String column2 = secondColumnFilter.getValue();
+        String filter2 = this.secondFilterField.getText().toLowerCase();
+        String column2 = this.secondColumnFilter.getValue();
 
-        List<Map<String, String>> filteredData = data.stream().filter(row -> {
+        List<Map<String, String>> filteredData = this.data.stream().filter(row -> {
             boolean matches = true;
             if (column1 != null && !filter1.isEmpty()) {
                 matches &= row.getOrDefault(column1, "").toLowerCase().contains(filter1);
@@ -188,20 +188,20 @@ public class TableManager extends Application {
             return matches;
         }).collect(Collectors.toList());
 
-        tableView.setItems(FXCollections.observableArrayList(filteredData));
+        this.tableView.setItems(FXCollections.observableArrayList(filteredData));
     }
 
     private void sortTable() {
-        if (data == null) return;
+        if (this.data == null) return;
 
-        String column = sortColumn.getValue();
+        String column = this.sortColumn.getValue();
         if (column == null) return;
 
-        data.sort(Comparator.comparing(row -> row.getOrDefault(column, ""), Comparator.nullsLast(String::compareTo)));
-        if (!sortAscending) Collections.reverse(data);
-        sortAscending = !sortAscending;
+        this.data.sort(Comparator.comparing(row -> row.getOrDefault(column, ""), Comparator.nullsLast(String::compareTo)));
+        if (!this.sortAscending) Collections.reverse(this.data);
+        this.sortAscending = !this.sortAscending;
 
-        tableView.setItems(FXCollections.observableArrayList(data));
+        this.tableView.setItems(FXCollections.observableArrayList(this.data));
     }
 
     private void exportFilteredData(Stage stage) {
@@ -215,12 +215,12 @@ public class TableManager extends Application {
                 Sheet sheet = workbook.createSheet(LANG.get(Language.Key.FilteredDataSheetName));
 
                 Row headerRow = sheet.createRow(0);
-                List<String> headers = new ArrayList<>(data.get(0).keySet());
+                List<String> headers = new ArrayList<>(this.data.get(0).keySet());
                 for (int i = 0; i < headers.size(); i++) {
                     headerRow.createCell(i).setCellValue(headers.get(i));
                 }
 
-                List<Map<String, String>> tableData = tableView.getItems();
+                List<Map<String, String>> tableData = this.tableView.getItems();
                 for (int i = 0; i < tableData.size(); i++) {
                     Row row = sheet.createRow(i + 1);
                     Map<String, String> rowData = tableData.get(i);
@@ -234,7 +234,7 @@ public class TableManager extends Application {
                 }
 
             } catch (IOException e) {
-                showAlert(LANG.get(Language.Key.ExportError));
+                this.showAlert(LANG.get(Language.Key.ExportError));
             }
         }
     }
