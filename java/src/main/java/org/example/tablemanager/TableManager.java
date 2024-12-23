@@ -22,7 +22,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class JavaFXApp extends Application {
+public class TableManager extends Application {
     private static final Language LANG = Language.en_US;
     private TableView<Map<String, String>> tableView;
     private ComboBox<String> firstColumnFilter;
@@ -97,7 +97,7 @@ public class JavaFXApp extends Application {
     private void openFile(Stage stage) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle(LANG.get(Language.Key.SelectFile));
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Archivos Excel", "*.xls", "*.xlsx", "*.xlsm"));
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(LANG.get(Language.Key.ExcelFiles), "*.xls", "*.xlsx", "*.xlsm"));
 
         File file = fileChooser.showOpenDialog(stage);
         if (file != null) {

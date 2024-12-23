@@ -12,7 +12,8 @@ public enum Language {
             Map.entry(Key.ColumnSelectPlaceholder, "Select column"),
             Map.entry(Key.FilterPlaceholder, "Filter by..."),
             Map.entry(Key.SortPlaceholder, "Order by..."),
-            Map.entry(Key.SelectFile, "Select a file")
+            Map.entry(Key.SelectFile, "Select a file"),
+            Map.entry(Key.ExcelFiles, "Excel files")
     )),
     es_ES(Map.ofEntries(
             Map.entry(Key.Title, "Gestor de tablas Excel"),
@@ -23,7 +24,8 @@ public enum Language {
             Map.entry(Key.ColumnSelectPlaceholder, "Seleccionar columna"),
             Map.entry(Key.FilterPlaceholder, "Filtrar por..."),
             Map.entry(Key.SortPlaceholder, "Ordenar por..."),
-            Map.entry(Key.SelectFile, "Seleccione un archivo")
+            Map.entry(Key.SelectFile, "Seleccione un archivo"),
+            Map.entry(Key.ExcelFiles, "Archivos Excel")
     ));
 
     private final Map<Key, String> messages;
@@ -45,6 +47,7 @@ public enum Language {
         ColumnSelectPlaceholder,
         FilterPlaceholder,
         SortPlaceholder,
-        SelectFile
+        SelectFile,
+        ExcelFiles
     }
 }
