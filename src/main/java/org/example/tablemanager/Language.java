@@ -13,7 +13,8 @@ public enum Language {
             Map.entry(Key.FilterPlaceholder, "Filter by..."),
             Map.entry(Key.SortPlaceholder, "Order by..."),
             Map.entry(Key.SelectFile, "Select a file"),
-            Map.entry(Key.ExcelFiles, "Excel files")
+            Map.entry(Key.ExcelFiles, "Excel files"),
+            Map.entry(Key.SheetSelection,"")
     )),
     es_ES(Map.ofEntries(
             Map.entry(Key.Title, "Gestor de tablas Excel"),
@@ -48,6 +49,8 @@ public enum Language {
         FilterPlaceholder,
         SortPlaceholder,
         SelectFile,
-        ExcelFiles
+        ExcelFiles,
+        SheetSelection,
+        SelectSheet
     }
 }

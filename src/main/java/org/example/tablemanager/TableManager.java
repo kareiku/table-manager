@@ -108,9 +108,9 @@ public class TableManager extends Application {
                 }
 
                 ChoiceDialog<String> sheetDialog = new ChoiceDialog<>(sheetNames.get(0), sheetNames);
-                sheetDialog.setTitle("Seleccionar Hoja");
+                sheetDialog.setTitle(LANG.get(Language.Key.SheetSelection));
                 sheetDialog.setHeaderText(null);
-                sheetDialog.setContentText("Seleccione una hoja:");
+                sheetDialog.setContentText(LANG.get(Language.Key.SelectSheet));
 
                 Optional<String> result = sheetDialog.showAndWait();
                 result.ifPresent(sheetName -> loadSheet(workbook.getSheet(sheetName)));
@@ -139,15 +139,15 @@ public class TableManager extends Application {
 
         for (int i = 1; i <= sheet.getLastRowNum(); i++) {
             Row row = sheet.getRow(i);
-            if (row == null) continue;
-
-            Map<String, String> rowData = new HashMap<>();
-            for (int j = 0; j < headers.size(); j++) {
-                Cell cell = row.getCell(j);
-                String value = getCellValue(cell);
-                rowData.put(headers.get(j), value);
+            if (row != null) {
+                Map<String, String> rowData = new HashMap<>();
+                for (int j = 0; j < headers.size(); j++) {
+                    Cell cell = row.getCell(j);
+                    String value = getCellValue(cell);
+                    rowData.put(headers.get(j), value);
+                }
+                data.add(rowData);
             }
-            data.add(rowData);
         }
 
         tableView.setItems(FXCollections.observableArrayList(data));
@@ -159,18 +159,14 @@ public class TableManager extends Application {
 
     private String getCellValue(Cell cell) {
         if (cell == null) return "";
-        switch (cell.getCellType()) {
-            case STRING:
-                return cell.getStringCellValue();
-            case NUMERIC:
-                return DateUtil.isCellDateFormatted(cell)
-                        ? new SimpleDateFormat("dd-MM-yyyy").format(cell.getDateCellValue())
-                        : String.valueOf(cell.getNumericCellValue());
-            case BOOLEAN:
-                return String.valueOf(cell.getBooleanCellValue());
-            default:
-                return "";
-        }
+        return switch (cell.getCellType()) {
+            case STRING -> cell.getStringCellValue();
+            case NUMERIC -> DateUtil.isCellDateFormatted(cell)
+                    ? new SimpleDateFormat("dd-MM-yyyy").format(cell.getDateCellValue())
+                    : String.valueOf(cell.getNumericCellValue());
+            case BOOLEAN -> String.valueOf(cell.getBooleanCellValue());
+            default -> "";
+        };
     }
 
     private void filterTable() {
