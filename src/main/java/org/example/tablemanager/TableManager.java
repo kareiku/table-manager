@@ -25,12 +25,12 @@ import java.util.stream.Collectors;
 public class TableManager extends Application {
     private static final Language LANG = Language.en_US;
     private TableView<Map<String, String>> tableView;
-    private ComboBox<String> firstColumnFilter;
-    private ComboBox<String> secondColumnFilter;
-    private TextField firstFilterField;
-    private TextField secondFilterField;
-    private ComboBox<String> sortColumn;
-    private List<Map<String, String>> data;
+    private ComboBox<String> firstFilteringColumn;
+    private ComboBox<String> secondFilteringColumn;
+    private TextField firstFilteringField;
+    private TextField secondFilteringField;
+    private ComboBox<String> sortingColumn;
+    private List<Map<String, String>> tableData;
     private boolean sortAscending = true;
 
     public static void main(String[] args) {
@@ -65,30 +65,30 @@ public class TableManager extends Application {
         HBox controls = new HBox(10);
         controls.setPadding(new Insets(10));
 
-        this.firstColumnFilter = new ComboBox<>();
-        this.firstColumnFilter.setPromptText(LANG.get(Language.Key.ColumnSelectPlaceholder));
-        this.firstColumnFilter.setMaxWidth(140);
+        this.firstFilteringColumn = new ComboBox<>();
+        this.firstFilteringColumn.setPromptText(LANG.get(Language.Key.ColumnSelectPlaceholder));
+        this.firstFilteringColumn.setMaxWidth(140);
 
-        this.firstFilterField = new TextField();
-        this.firstFilterField.setPromptText(LANG.get(Language.Key.FilterPlaceholder));
-        this.firstFilterField.setMaxWidth(150);
-        this.firstFilterField.textProperty().addListener((ignored0, ignored1, ignored2) -> this.filterTable());
+        this.firstFilteringField = new TextField();
+        this.firstFilteringField.setPromptText(LANG.get(Language.Key.FilterPlaceholder));
+        this.firstFilteringField.setMaxWidth(150);
+        this.firstFilteringField.textProperty().addListener((ignored0, ignored1, ignored2) -> this.filterTable());
 
-        this.secondColumnFilter = new ComboBox<>();
-        this.secondColumnFilter.setPromptText(LANG.get(Language.Key.ColumnSelectPlaceholder));
-        this.secondColumnFilter.setMaxWidth(140);
+        this.secondFilteringColumn = new ComboBox<>();
+        this.secondFilteringColumn.setPromptText(LANG.get(Language.Key.ColumnSelectPlaceholder));
+        this.secondFilteringColumn.setMaxWidth(140);
 
-        this.secondFilterField = new TextField();
-        this.secondFilterField.setPromptText(LANG.get(Language.Key.FilterPlaceholder));
-        this.secondFilterField.setMaxWidth(150);
-        this.secondFilterField.textProperty().addListener((ignored0, ignored1, ignored2) -> this.filterTable());
+        this.secondFilteringField = new TextField();
+        this.secondFilteringField.setPromptText(LANG.get(Language.Key.FilterPlaceholder));
+        this.secondFilteringField.setMaxWidth(150);
+        this.secondFilteringField.textProperty().addListener((ignored0, ignored1, ignored2) -> this.filterTable());
 
-        this.sortColumn = new ComboBox<>();
-        this.sortColumn.setPromptText(LANG.get(Language.Key.SortPlaceholder));
-        this.sortColumn.setMaxWidth(130);
-        this.sortColumn.setOnAction(ignored -> this.sortTable());
+        this.sortingColumn = new ComboBox<>();
+        this.sortingColumn.setPromptText(LANG.get(Language.Key.SortPlaceholder));
+        this.sortingColumn.setMaxWidth(130);
+        this.sortingColumn.setOnAction(ignored -> this.sortTable());
 
-        controls.getChildren().addAll(this.firstColumnFilter, this.firstFilterField, this.secondColumnFilter, this.secondFilterField, this.sortColumn);
+        controls.getChildren().addAll(this.firstFilteringColumn, this.firstFilteringField, this.secondFilteringColumn, this.secondFilteringField, this.sortingColumn);
         root.setCenter(controls);
 
         this.tableView = new TableView<>();
@@ -127,7 +127,7 @@ public class TableManager extends Application {
     }
 
     private void loadSheet(Sheet sheet) {
-        this.data = new ArrayList<>();
+        this.tableData = new ArrayList<>();
         this.tableView.getColumns().clear();
 
         Row headerRow = sheet.getRow(0);
@@ -151,15 +151,15 @@ public class TableManager extends Application {
                     String value = this.getCellValue(cell);
                     rowData.put(headers.get(j), value);
                 }
-                this.data.add(rowData);
+                this.tableData.add(rowData);
             }
         }
 
-        this.tableView.setItems(FXCollections.observableArrayList(this.data));
+        this.tableView.setItems(FXCollections.observableArrayList(this.tableData));
 
-        this.firstColumnFilter.setItems(FXCollections.observableArrayList(headers));
-        this.secondColumnFilter.setItems(FXCollections.observableArrayList(headers));
-        this.sortColumn.setItems(FXCollections.observableArrayList(headers));
+        this.firstFilteringColumn.setItems(FXCollections.observableArrayList(headers));
+        this.secondFilteringColumn.setItems(FXCollections.observableArrayList(headers));
+        this.sortingColumn.setItems(FXCollections.observableArrayList(headers));
     }
 
     private String getCellValue(Cell cell) {
@@ -175,15 +175,15 @@ public class TableManager extends Application {
     }
 
     private void filterTable() {
-        if (this.data == null) return;
+        if (this.tableData == null) return;
 
-        String filter1 = this.firstFilterField.getText().toLowerCase();
-        String column1 = this.firstColumnFilter.getValue();
+        String filter1 = this.firstFilteringField.getText().toLowerCase();
+        String column1 = this.firstFilteringColumn.getValue();
 
-        String filter2 = this.secondFilterField.getText().toLowerCase();
-        String column2 = this.secondColumnFilter.getValue();
+        String filter2 = this.secondFilteringField.getText().toLowerCase();
+        String column2 = this.secondFilteringColumn.getValue();
 
-        List<Map<String, String>> filteredData = this.data.stream().filter(row -> {
+        List<Map<String, String>> filteredData = this.tableData.stream().filter(row -> {
             boolean matches = true;
             if (column1 != null && !filter1.isEmpty()) {
                 matches &= row.getOrDefault(column1, "").toLowerCase().contains(filter1);
@@ -198,16 +198,16 @@ public class TableManager extends Application {
     }
 
     private void sortTable() {
-        if (this.data == null) return;
+        if (this.tableData == null) return;
 
-        String column = this.sortColumn.getValue();
+        String column = this.sortingColumn.getValue();
         if (column == null) return;
 
-        this.data.sort(Comparator.comparing(row -> row.getOrDefault(column, ""), Comparator.nullsLast(String::compareTo)));
-        if (!this.sortAscending) Collections.reverse(this.data);
+        this.tableData.sort(Comparator.comparing(row -> row.getOrDefault(column, ""), Comparator.nullsLast(String::compareTo)));
+        if (!this.sortAscending) Collections.reverse(this.tableData);
         this.sortAscending = !this.sortAscending;
 
-        this.tableView.setItems(FXCollections.observableArrayList(this.data));
+        this.tableView.setItems(FXCollections.observableArrayList(this.tableData));
     }
 
     private void exportFilteredData(Stage stage) {
@@ -221,7 +221,7 @@ public class TableManager extends Application {
                 Sheet sheet = workbook.createSheet(LANG.get(Language.Key.FilteredDataSheetName));
 
                 Row headerRow = sheet.createRow(0);
-                List<String> headers = new ArrayList<>(this.data.get(0).keySet());
+                List<String> headers = new ArrayList<>(this.tableData.get(0).keySet());
                 for (int i = 0; i < headers.size(); i++) {
                     headerRow.createCell(i).setCellValue(headers.get(i));
                 }
