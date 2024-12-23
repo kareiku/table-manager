@@ -1,9 +1,6 @@
 target/
-
+!.mvn/wrapper/maven-wrapper.jar
 .idea/
+*.iws
 *.iml
-
-.mvn/wrapper/
-
-.DS_Store
-Thumbs.db
+*.ipr
