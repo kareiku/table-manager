@@ -1,0 +1,14 @@
+* {
+    -fx-base-background: #004490;
+    -fx-base-text: white;
+}
+
+#open-item {
+    -fx-background-color: -fx-base-background;
+    -fx-text-fill: -fx-base-text;
+}
+
+#exit-item {
+    -fx-background-color: -fx-base-background;
+    -fx-text-fill: -fx-base-text;
+}

@@ -1,11 +1,11 @@
 package org.example.tablemanager;
 
 import javafx.application.Application;
+import javafx.event.EventType;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
 import java.util.Objects;
@@ -13,7 +13,6 @@ import java.util.Objects;
 public class Main extends Application {
     private static final Language LANG = Language.en_US;
     private static final String ICON_PATH = "/icon.png";
-    private static final String COLOR = "#004490";
 
     @Override
     public void start(Stage stage) {
@@ -24,15 +23,26 @@ public class Main extends Application {
         stage.setMaximized(true);
         stage.setResizable(true);
 
-        GridPane root = new GridPane();
-        root.setMinSize(500, 300);
+        Button openItem = new Button(LANG.get(Language.Key.OpenFile));
+        openItem.setId("open-item");
 
-        Label label = new Label("test");
-        root.getChildren().add(label);
-        Button exitButton = new Button(LANG.get(Language.Key.Exit));
-        root.getChildren().add(exitButton);
+        Button exitItem = new Button(LANG.get(Language.Key.Exit));
+        exitItem.setId("exit-item");
+        exitItem.setOnAction(actionEvent -> System.exit(0));
+
+        ToolBar toolBar = new ToolBar();
+        toolBar.getItems().addAll(openItem, exitItem);
+
+        HBox root = new HBox();
+        root.setMinSize(500, 300);
+        root.getChildren().add(toolBar);
+
+        TextField textField = new TextField(LANG.get(Language.Key.Filter));
+        root.getChildren().add(textField);
+        String s = textField.getText();
 
         Scene scene = new Scene(root);
+        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/styles.css")).toExternalForm());
         stage.setScene(scene);
         stage.show();
     }
