@@ -23,6 +23,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class JavaFXApp extends Application {
+    private static final Language LANG = Language.en_US;
     private TableView<Map<String, String>> tableView;
     private ComboBox<String> firstColumnFilter;
     private ComboBox<String> secondColumnFilter;
@@ -37,64 +38,65 @@ public class JavaFXApp extends Application {
     }
 
     @Override
-    public void start(Stage primaryStage) {
-        primaryStage.setTitle("Visualizador Excel");
-
-        // Set application icon
-        primaryStage.getIcons().add(new Image("file:icon.png"));
+    public void start(Stage stage) {
+        stage.setTitle(LANG.get(Language.Key.Title));
+        stage.getIcons().add(new Image("file:icon.png"));
+        stage.setMaximized(true);
+        stage.setResizable(true);
 
         BorderPane root = new BorderPane();
 
-        // Menu bar
+        MenuItem openItem = new MenuItem(LANG.get(Language.Key.OpenFile));
+        openItem.setOnAction(ignored -> openFile(stage));
+
+        MenuItem exportItem = new MenuItem(LANG.get(Language.Key.ExportFile));
+        exportItem.setOnAction(ignored -> exportFilteredData(stage));
+
+        MenuItem exitItem = new MenuItem(LANG.get(Language.Key.Exit));
+        exitItem.setOnAction(ignored -> System.exit(0));
+
+        Menu fileMenu = new Menu(LANG.get(Language.Key.FileMenu));
+        fileMenu.getItems().addAll(openItem, exportItem, exitItem);
+
         MenuBar menuBar = new MenuBar();
-        Menu fileMenu = new Menu("Archivo");
-        MenuItem openItem = new MenuItem("Abrir");
-        openItem.setOnAction(e -> openFile(primaryStage));
-        MenuItem exportItem = new MenuItem("Exportar");
-        exportItem.setOnAction(e -> exportFilteredData(primaryStage));
-        fileMenu.getItems().addAll(openItem, exportItem);
         menuBar.getMenus().add(fileMenu);
         root.setTop(menuBar);
 
-        // Filter and sort controls
         HBox controls = new HBox(10);
         controls.setPadding(new Insets(10));
 
         firstColumnFilter = new ComboBox<>();
-        firstColumnFilter.setPromptText("Primera columna");
+        firstColumnFilter.setPromptText(LANG.get(Language.Key.ColumnSelectPlaceholder));
 
         firstFilterField = new TextField();
-        firstFilterField.setPromptText("Filtro 1");
-        firstFilterField.textProperty().addListener((obs, oldVal, newVal) -> filterTable());
+        firstFilterField.setPromptText(LANG.get(Language.Key.FilterPlaceholder));
+        firstFilterField.textProperty().addListener((ignored0, ignored1, ignored2) -> filterTable());
 
         secondColumnFilter = new ComboBox<>();
-        secondColumnFilter.setPromptText("Segunda columna");
+        secondColumnFilter.setPromptText(LANG.get(Language.Key.ColumnSelectPlaceholder));
 
         secondFilterField = new TextField();
-        secondFilterField.setPromptText("Filtro 2");
-        secondFilterField.textProperty().addListener((obs, oldVal, newVal) -> filterTable());
+        secondFilterField.setPromptText(LANG.get(Language.Key.FilterPlaceholder));
+        secondFilterField.textProperty().addListener((ignored0, ignored1, ignored2) -> filterTable());
 
         sortColumn = new ComboBox<>();
-        sortColumn.setPromptText("Ordenar por");
+        sortColumn.setPromptText(LANG.get(Language.Key.SortPlaceholder));
+        sortColumn.setOnAction(ignored -> sortTable());
 
-        Button sortButton = new Button("Ordenar");
-        sortButton.setOnAction(e -> sortTable());
-
-        controls.getChildren().addAll(firstColumnFilter, firstFilterField, secondColumnFilter, secondFilterField, sortColumn, sortButton);
+        controls.getChildren().addAll(firstColumnFilter, firstFilterField, secondColumnFilter, secondFilterField, sortColumn);
         root.setCenter(controls);
 
-        // Table view
         tableView = new TableView<>();
         root.setBottom(tableView);
 
         Scene scene = new Scene(root, 800, 600);
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        stage.setScene(scene);
+        stage.show();
     }
 
     private void openFile(Stage stage) {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Seleccione un archivo");
+        fileChooser.setTitle(LANG.get(Language.Key.SelectFile));
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Archivos Excel", "*.xls", "*.xlsx", "*.xlsm"));
 
         File file = fileChooser.showOpenDialog(stage);
