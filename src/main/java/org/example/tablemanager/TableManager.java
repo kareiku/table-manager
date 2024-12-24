@@ -21,9 +21,7 @@ import java.util.Optional;
 import java.util.stream.StreamSupport;
 
 public class TableManager extends Application {
-    private record Table(String[][] table) {
-    }
-
+    private Table table = null;
     private static final Language LANG = Language.en_US;
     private TableView<Map<String, String>> tableView;
     private ComboBox<String> firstFilteringColumn;
@@ -48,7 +46,7 @@ public class TableManager extends Application {
         BorderPane root = new BorderPane();
 
         MenuItem openItem = new MenuItem(LANG.get(Language.Key.OpenFile));
-        openItem.setOnAction(ignored -> this.openFile(stage));
+        openItem.setOnAction(ignored -> this.table.openFile(stage));
 
         MenuItem exportItem = new MenuItem(LANG.get(Language.Key.ExportFile));
         exportItem.setOnAction(ignored -> this.exportFilteredData(stage));
@@ -263,43 +261,5 @@ public class TableManager extends Application {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
-    }
-
-    private File chooseFile(Stage stage) {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle(LANG.get(Language.Key.SelectFile));
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(LANG.get(Language.Key.ExcelFiles), "*.xls", "*.xlsx", "*.xlsm"));
-        return fileChooser.showOpenDialog(stage);
-    }
-
-    private Sheet chooseSheet(Workbook workbook) {
-        List<String> sheetNames = new ArrayList<>();
-        workbook.iterator().forEachRemaining(sheet -> sheetNames.add(sheet.getSheetName()));
-
-        ChoiceDialog<String> sheetDialog = new ChoiceDialog<>(sheetNames.get(0), sheetNames);
-        sheetDialog.setTitle(LANG.get(Language.Key.Title));
-        sheetDialog.setHeaderText(null);
-        sheetDialog.setContentText(LANG.get(Language.Key.SelectSheet));
-        Optional<String> sheetNameOptional = sheetDialog.showAndWait();
-
-        return sheetNameOptional.map(workbook::getSheet).orElse(null);
-    }
-
-    private Table excelToTable(File file) {
-        try (FileInputStream fileInputStream = new FileInputStream(file)) {
-            Workbook workbook = WorkbookFactory.create(fileInputStream);
-            Sheet sheet = this.chooseSheet(workbook);
-            return new Table(StreamSupport
-                    .stream(sheet.spliterator(), false)
-                    .map(row -> StreamSupport.stream(row.spliterator(), false).map(Object::toString).toArray(String[]::new))
-                    .toList().toArray(String[][]::new));
-        } catch (IOException ex) {
-            this.showAlert(LANG.get(Language.Key.OpenError));
-        }
-        return null;
-    }
-
-    private Table openFile(Stage stage) {
-        return this.excelToTable(this.chooseFile(stage));
     }
 }
