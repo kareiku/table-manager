@@ -1,28 +1,29 @@
 package org.example.tablemanager;
 
 import javafx.application.Application;
-import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
-import javafx.scene.layout.*;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.StreamSupport;
 
 public class TableManager extends Application {
+    private record Table(String[][] table) {
+    }
+
     private static final Language LANG = Language.en_US;
     private TableView<Map<String, String>> tableView;
     private ComboBox<String> firstFilteringColumn;
@@ -100,6 +101,7 @@ public class TableManager extends Application {
         stage.show();
     }
 
+    /*
     private void openFile(Stage stage) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle(LANG.get(Language.Key.SelectFile));
@@ -107,7 +109,16 @@ public class TableManager extends Application {
 
         File file = fileChooser.showOpenDialog(stage);
         if (file != null) {
-            try (FileInputStream fis = new FileInputStream(file); Workbook workbook = new XSSFWorkbook(fis)) {
+            try (FileInputStream fis = new FileInputStream(file)) {
+                Workbook workbook;
+                if (file.getName().endsWith(".xlsx") || file.getName().endsWith(".xlsm")) {
+                    workbook = new XSSFWorkbook(fis);
+                } else if (file.getName().endsWith(".xls")) {
+                    workbook = new HSSFWorkbook(fis);
+                } else {
+                    throw new IllegalArgumentException("Unsupported file format");
+                }
+
                 List<String> sheetNames = new ArrayList<>();
                 for (Sheet sheet : workbook) {
                     sheetNames.add(sheet.getSheetName());
@@ -118,9 +129,10 @@ public class TableManager extends Application {
                 sheetDialog.setHeaderText(null);
                 sheetDialog.setContentText(LANG.get(Language.Key.SelectSheet));
 
-                Optional<String> result = sheetDialog.showAndWait();
-                result.ifPresent(sheetName -> this.loadSheet(workbook.getSheet(sheetName)));
-            } catch (IOException e) {
+                Optional<String> sheet = sheetDialog.showAndWait();
+                sheet.ifPresent(sheetName -> this.loadSheet(workbook.getSheet(sheetName)));
+
+            } catch (IOException | IllegalArgumentException ex) {
                 this.showAlert(LANG.get(Language.Key.OpenError));
             }
         }
@@ -135,7 +147,7 @@ public class TableManager extends Application {
 
         List<String> headers = new ArrayList<>();
         for (Cell cell : headerRow) {
-            String header = cell.getStringCellValue();
+            String header = cell != null ? cell.getStringCellValue() : "";
             headers.add(header);
             TableColumn<Map<String, String>, String> column = new TableColumn<>(header);
             column.setCellValueFactory(new PropertyValueFactory<>(header));
@@ -238,11 +250,12 @@ public class TableManager extends Application {
                 try (FileOutputStream fos = new FileOutputStream(file)) {
                     workbook.write(fos);
                 }
-            } catch (IOException e) {
+            } catch (IOException ex) {
                 this.showAlert(LANG.get(Language.Key.ExportError));
             }
         }
     }
+    */
 
     private void showAlert(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -250,5 +263,43 @@ public class TableManager extends Application {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    private File chooseFile(Stage stage) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle(LANG.get(Language.Key.SelectFile));
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(LANG.get(Language.Key.ExcelFiles), "*.xls", "*.xlsx", "*.xlsm"));
+        return fileChooser.showOpenDialog(stage);
+    }
+
+    private Sheet chooseSheet(Workbook workbook) {
+        List<String> sheetNames = new ArrayList<>();
+        workbook.iterator().forEachRemaining(sheet -> sheetNames.add(sheet.getSheetName()));
+
+        ChoiceDialog<String> sheetDialog = new ChoiceDialog<>(sheetNames.get(0), sheetNames);
+        sheetDialog.setTitle(LANG.get(Language.Key.Title));
+        sheetDialog.setHeaderText(null);
+        sheetDialog.setContentText(LANG.get(Language.Key.SelectSheet));
+        Optional<String> sheetNameOptional = sheetDialog.showAndWait();
+
+        return sheetNameOptional.map(workbook::getSheet).orElse(null);
+    }
+
+    private Table excelToTable(File file) {
+        try (FileInputStream fileInputStream = new FileInputStream(file)) {
+            Workbook workbook = WorkbookFactory.create(fileInputStream);
+            Sheet sheet = this.chooseSheet(workbook);
+            return new Table(StreamSupport
+                    .stream(sheet.spliterator(), false)
+                    .map(row -> StreamSupport.stream(row.spliterator(), false).map(Object::toString).toArray(String[]::new))
+                    .toList().toArray(String[][]::new));
+        } catch (IOException ex) {
+            this.showAlert(LANG.get(Language.Key.OpenError));
+        }
+        return null;
+    }
+
+    private Table openFile(Stage stage) {
+        return this.excelToTable(this.chooseFile(stage));
     }
 }
