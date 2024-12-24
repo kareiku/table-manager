@@ -21,7 +21,6 @@ import java.util.Optional;
 import java.util.stream.StreamSupport;
 
 public class TableManager extends Application {
-    private Table table = null;
     private static final Language LANG = Language.en_US;
     private TableView<Map<String, String>> tableView;
     private ComboBox<String> firstFilteringColumn;
@@ -104,8 +103,8 @@ public class TableManager extends Application {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle(LANG.get(Language.Key.SelectFile));
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(LANG.get(Language.Key.ExcelFiles), "*.xls", "*.xlsx", "*.xlsm"));
-
         File file = fileChooser.showOpenDialog(stage);
+
         if (file != null) {
             try (FileInputStream fis = new FileInputStream(file)) {
                 Workbook workbook;
@@ -224,8 +223,8 @@ public class TableManager extends Application {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle(LANG.get(Language.Key.SaveFile));
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(LANG.get(Language.Key.ExcelFiles), "*.xlsx"));
-
         File file = fileChooser.showSaveDialog(stage);
+
         if (file != null) {
             try (Workbook workbook = new XSSFWorkbook()) {
                 Sheet sheet = workbook.createSheet(LANG.get(Language.Key.FilteredDataSheetName));
@@ -261,5 +260,31 @@ public class TableManager extends Application {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    private void openFile(Stage stage) {
+        File file = this.chooseFile(stage);
+        Workbook workbook = Controller.getInstance().getWorkbook(file);
+        Sheet sheet = this.chooseSheet(workbook);
+    }
+
+    private File chooseFile(Stage stage) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle(LANG.get(Language.Key.SelectFile));
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(LANG.get(Language.Key.ExcelFiles), "*.xls", "*.xlsx", "*.xlsm"));
+        return fileChooser.showOpenDialog(stage);
+    }
+
+    private Sheet chooseSheet(Workbook workbook) {
+        List<String> sheetNames = new ArrayList<>();
+        workbook.iterator().forEachRemaining(sheet -> sheetNames.add(sheet.getSheetName()));
+
+        ChoiceDialog<String> sheetDialog = new ChoiceDialog<>(sheetNames.get(0), sheetNames);
+        sheetDialog.setTitle(LANG.get(Language.Key.Title));
+        sheetDialog.setHeaderText(null);
+        sheetDialog.setContentText(LANG.get(Language.Key.SelectSheet));
+        Optional<String> sheetNameOptional = sheetDialog.showAndWait();
+
+        return sheetNameOptional.map(workbook::getSheet).orElse(null);
     }
 }

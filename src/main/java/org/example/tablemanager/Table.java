@@ -59,6 +59,6 @@ public class Table {
     }
 
     public void openFile(Stage stage) {
-        this = this.excelToTable(this.chooseFile(stage));
+        this.excelToTable(this.chooseFile(stage));
     }
 }
