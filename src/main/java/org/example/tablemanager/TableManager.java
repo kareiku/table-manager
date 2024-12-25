@@ -17,84 +17,77 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class TableManager extends Application {
+public final class TableManager extends Application {
     private static final Language LANG = Language.en_US;
-    private final Controller controller = new Controller();
+    private Controller controller;
+    private Stage stage;
 
-    private TableView<Map<String, String>> tableView;
-    private ComboBox<String> firstFilteringColumn;
-    private ComboBox<String> secondFilteringColumn;
-    private TextField firstFilteringField;
-    private TextField secondFilteringField;
-    private ComboBox<String> sortingColumn;
     private List<Map<String, String>> tableData;
     private boolean sortAscending = true;
 
     public static void main(String[] args) {
-        launch(args);
+        TableManager.launch(args);
     }
 
     @Override
     public void start(Stage stage) {
-        stage.setTitle(LANG.get(Language.Key.Title));
-        stage.getIcons().add(new Image("file:icon.png"));
-        stage.setMaximized(true);
-        stage.setResizable(true);
+        this.controller = new Controller();
+        this.stage = stage;
+
+        this.stage.setTitle(LANG.get(Language.Key.Title));
+        this.stage.getIcons().add(new Image("file:icon.png"));
+        this.stage.setMaximized(true);
+        this.stage.setResizable(true);
 
         BorderPane root = new BorderPane();
 
         MenuItem openItem = new MenuItem(LANG.get(Language.Key.OpenFile));
-        openItem.setOnAction(ignored -> this.openFile(stage));
+        openItem.setOnAction(ignored -> this.openFile());
 
         MenuItem exportItem = new MenuItem(LANG.get(Language.Key.ExportFile));
-        exportItem.setOnAction(ignored -> this.exportFilteredData(stage));
+        exportItem.setOnAction(ignored -> this.exportFilteredData());
 
         MenuItem exitItem = new MenuItem(LANG.get(Language.Key.Exit));
         exitItem.setOnAction(ignored -> System.exit(0));
 
-        Menu fileMenu = new Menu(LANG.get(Language.Key.FileMenu));
-        fileMenu.getItems().addAll(openItem, exportItem, exitItem);
-
-        MenuBar menuBar = new MenuBar();
-        menuBar.getMenus().add(fileMenu);
-        root.setTop(menuBar);
+        root.setTop(new MenuBar(new Menu(LANG.get(Language.Key.FileMenu), null, openItem, exportItem, exitItem)));
 
         HBox controls = new HBox(10);
         controls.setPadding(new Insets(10));
 
-        this.firstFilteringColumn = new ComboBox<>();
-        this.firstFilteringColumn.setPromptText(LANG.get(Language.Key.ColumnSelectPlaceholder));
-        this.firstFilteringColumn.setMaxWidth(140);
+        ComboBox<String> firstFilteringColumn = new ComboBox<>();
+        firstFilteringColumn.setPromptText(LANG.get(Language.Key.ColumnSelectPlaceholder));
+        firstFilteringColumn.setMaxWidth(140);
 
-        this.firstFilteringField = new TextField();
-        this.firstFilteringField.setPromptText(LANG.get(Language.Key.FilterPlaceholder));
-        this.firstFilteringField.setMaxWidth(150);
-        this.firstFilteringField.textProperty().addListener((ignored0, ignored1, ignored2) -> this.filterTable());
+        TextField firstFilteringField = new TextField();
+        firstFilteringField.setPromptText(LANG.get(Language.Key.FilterPlaceholder));
+        firstFilteringField.setMaxWidth(150);
+        firstFilteringField.textProperty().addListener((ignored0, ignored1, ignored2) -> this.filterTable());
 
-        this.secondFilteringColumn = new ComboBox<>();
-        this.secondFilteringColumn.setPromptText(LANG.get(Language.Key.ColumnSelectPlaceholder));
-        this.secondFilteringColumn.setMaxWidth(140);
+        ComboBox<String> secondFilteringColumn = new ComboBox<>();
+        secondFilteringColumn.setPromptText(LANG.get(Language.Key.ColumnSelectPlaceholder));
+        secondFilteringColumn.setMaxWidth(140);
 
-        this.secondFilteringField = new TextField();
-        this.secondFilteringField.setPromptText(LANG.get(Language.Key.FilterPlaceholder));
-        this.secondFilteringField.setMaxWidth(150);
-        this.secondFilteringField.textProperty().addListener((ignored0, ignored1, ignored2) -> this.filterTable());
+        TextField secondFilteringField = new TextField();
+        secondFilteringField.setPromptText(LANG.get(Language.Key.FilterPlaceholder));
+        secondFilteringField.setMaxWidth(150);
+        secondFilteringField.textProperty().addListener((ignored0, ignored1, ignored2) -> this.filterTable());
 
-        this.sortingColumn = new ComboBox<>();
-        this.sortingColumn.setPromptText(LANG.get(Language.Key.SortPlaceholder));
-        this.sortingColumn.setMaxWidth(130);
-        this.sortingColumn.setOnAction(ignored -> this.sortTable());
+        ComboBox<String> sortingColumn = new ComboBox<>();
+        sortingColumn.setPromptText(LANG.get(Language.Key.SortPlaceholder));
+        sortingColumn.setMaxWidth(130);
+        sortingColumn.setOnAction(ignored -> this.sortTable());
 
-        controls.getChildren().addAll(this.firstFilteringColumn, this.firstFilteringField, this.secondFilteringColumn, this.secondFilteringField, this.sortingColumn);
+        controls.getChildren().addAll(firstFilteringColumn, firstFilteringField, secondFilteringColumn, secondFilteringField, sortingColumn);
         root.setCenter(controls);
 
-        this.tableView = new TableView<>();
-        this.tableView.setPrefHeight(960);
-        root.setBottom(this.tableView);
+        TableView<Map<String, String>> tableView = new TableView<>();
+        tableView.setPrefHeight(960);
+        root.setBottom(tableView);
 
         Scene scene = new Scene(root, 800, 600);
-        stage.setScene(scene);
-        stage.show();
+        this.stage.setScene(scene);
+        this.stage.show();
     }
 
     /*
@@ -261,11 +254,18 @@ public class TableManager extends Application {
         alert.showAndWait();
     }
 
-    private File chooseFile(Stage stage) {
+    private File chooseOpenFile() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle(LANG.get(Language.Key.SelectFile));
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(LANG.get(Language.Key.ExcelFiles), "*.xls", "*.xlsx", "*.xlsm"));
-        return fileChooser.showOpenDialog(stage);
+        return fileChooser.showOpenDialog(this.stage);
+    }
+
+    private File chooseSaveFile() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle(LANG.get(Language.Key.SelectFile));
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(LANG.get(Language.Key.ExcelFiles), "*.xlsx"));
+        return fileChooser.showSaveDialog(this.stage);
     }
 
     private Sheet chooseSheet(Workbook workbook) {
@@ -281,8 +281,8 @@ public class TableManager extends Application {
         return sheetNameOptional.map(workbook::getSheet).orElse(null);
     }
 
-    private void openFile(Stage stage) {
-        File file = this.chooseFile(stage);
+    private void openFile() {
+        File file = this.chooseOpenFile();
         try (Workbook workbook = WorkbookFactory.create(file)) {
             Sheet sheet = this.chooseSheet(workbook);
             this.controller.loadSheet(sheet);

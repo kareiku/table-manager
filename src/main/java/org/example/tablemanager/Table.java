@@ -2,12 +2,12 @@ package org.example.tablemanager;
 
 public record Table(String[][] table) {
     // TODO
-    public Table sort(int field) {
+    public Table getSorted(int fieldNumber) {
         return null;
     }
 
     // TODO
-    public Table filter(int field) {
+    public Table getFiltered(int fieldNumber) {
         return null;
     }
 }
