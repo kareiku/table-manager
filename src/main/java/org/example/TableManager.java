@@ -1,4 +1,4 @@
-package org.example.tablemanager;
+package org.example;
 
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -9,20 +9,25 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public final class TableManager extends Application {
     private static final Language LANG = Language.en_US;
     private Controller controller;
     private Stage stage;
 
-    private List<Map<String, String>> tableData;
+    private ComboBox<String> firstFilteringColumn;
+    private TextField firstFilteringField;
+    private ComboBox<String> secondFilteringColumn;
+    private TextField secondFilteringField;
+    private ComboBox<String> sortingColumn;
+    private TableView<Map<String, String>> tableView;
+
     private boolean sortAscending = true;
 
     public static void main(String[] args) {
@@ -33,11 +38,10 @@ public final class TableManager extends Application {
     public void start(Stage stage) {
         this.controller = new Controller();
         this.stage = stage;
-
-        this.stage.setTitle(LANG.get(Language.Key.Title));
-        this.stage.getIcons().add(new Image("file:icon.png"));
-        this.stage.setMaximized(true);
-        this.stage.setResizable(true);
+        stage.setTitle(LANG.get(Language.Key.Title));
+        stage.getIcons().add(new Image("file:icon.png"));
+        stage.setMaximized(true);
+        stage.setResizable(true);
 
         BorderPane root = new BorderPane();
 
@@ -45,7 +49,7 @@ public final class TableManager extends Application {
         openItem.setOnAction(ignored -> this.openFile());
 
         MenuItem exportItem = new MenuItem(LANG.get(Language.Key.ExportFile));
-        exportItem.setOnAction(ignored -> this.exportFilteredData());
+        exportItem.setOnAction(ignored -> System.console());
 
         MenuItem exitItem = new MenuItem(LANG.get(Language.Key.Exit));
         exitItem.setOnAction(ignored -> System.exit(0));
@@ -55,39 +59,39 @@ public final class TableManager extends Application {
         HBox controls = new HBox(10);
         controls.setPadding(new Insets(10));
 
-        ComboBox<String> firstFilteringColumn = new ComboBox<>();
-        firstFilteringColumn.setPromptText(LANG.get(Language.Key.ColumnSelectPlaceholder));
-        firstFilteringColumn.setPrefWidth(140);
+        this.firstFilteringColumn = new ComboBox<>();
+        this.firstFilteringColumn.setPromptText(LANG.get(Language.Key.ColumnSelectPlaceholder));
+        this.firstFilteringColumn.setPrefWidth(140);
 
-        TextField firstFilteringField = new TextField();
-        firstFilteringField.setPromptText(LANG.get(Language.Key.FilterPlaceholder));
-        firstFilteringField.setPrefWidth(150);
-        firstFilteringField.textProperty().addListener((ignored0, ignored1, ignored2) -> this.filterTable());
+        this.firstFilteringField = new TextField();
+        this.firstFilteringField.setPromptText(LANG.get(Language.Key.FilterPlaceholder));
+        this.firstFilteringField.setPrefWidth(150);
+        this.firstFilteringField.textProperty().addListener((ignored0, ignored1, ignored2) -> System.console());
 
-        ComboBox<String> secondFilteringColumn = new ComboBox<>();
-        secondFilteringColumn.setPromptText(LANG.get(Language.Key.ColumnSelectPlaceholder));
-        secondFilteringColumn.setPrefWidth(140);
+        this.secondFilteringColumn = new ComboBox<>();
+        this.secondFilteringColumn.setPromptText(LANG.get(Language.Key.ColumnSelectPlaceholder));
+        this.secondFilteringColumn.setPrefWidth(140);
 
-        TextField secondFilteringField = new TextField();
-        secondFilteringField.setPromptText(LANG.get(Language.Key.FilterPlaceholder));
-        secondFilteringField.setPrefWidth(150);
-        secondFilteringField.textProperty().addListener((ignored0, ignored1, ignored2) -> this.filterTable());
+        this.secondFilteringField = new TextField();
+        this.secondFilteringField.setPromptText(LANG.get(Language.Key.FilterPlaceholder));
+        this.secondFilteringField.setPrefWidth(150);
+        this.secondFilteringField.textProperty().addListener((ignored0, ignored1, ignored2) -> System.console());
 
-        ComboBox<String> sortingColumn = new ComboBox<>();
-        sortingColumn.setPromptText(LANG.get(Language.Key.SortPlaceholder));
-        sortingColumn.setPrefWidth(130);
-        sortingColumn.setOnAction(ignored -> this.sortTable());
+        this.sortingColumn = new ComboBox<>();
+        this.sortingColumn.setPromptText(LANG.get(Language.Key.SortPlaceholder));
+        this.sortingColumn.setPrefWidth(130);
+        this.sortingColumn.setOnAction(ignored -> System.console());
 
-        controls.getChildren().addAll(firstFilteringColumn, firstFilteringField, secondFilteringColumn, secondFilteringField, sortingColumn);
+        controls.getChildren().addAll(this.firstFilteringColumn, this.firstFilteringField, this.secondFilteringColumn, this.secondFilteringField, this.sortingColumn);
         root.setCenter(controls);
 
-        TableView<Map<String, String>> tableView = new TableView<>();
-        tableView.setPrefHeight(960);
-        root.setBottom(tableView);
+        this.tableView = new TableView<>();
+        this.tableView.setPrefHeight(960);
+        root.setBottom(this.tableView);
 
         Scene scene = new Scene(root, 800, 600);
-        this.stage.setScene(scene);
-        this.stage.show();
+        stage.setScene(scene);
+        stage.show();
     }
 
     /*
@@ -285,7 +289,11 @@ public final class TableManager extends Application {
         File file = this.chooseOpenFile();
         try (Workbook workbook = WorkbookFactory.create(file)) {
             Sheet sheet = this.chooseSheet(workbook);
-            this.controller.loadSheet(sheet);
+            Table table = this.controller.loadSheet(sheet);
+            for (String[] a : table.table()) {
+                for (String s : a) {
+                }
+            }
         } catch (Exception ignore) {
         }
     }
