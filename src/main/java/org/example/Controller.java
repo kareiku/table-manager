@@ -8,6 +8,15 @@ public class Controller {
     private Table original;
     private Table modified;
 
+    private enum SortValue {UNSORTED, ASC, DESC}
+
+    private static final SortValue[] sortValues = SortValue.values();
+    private SortValue currentSortValue;
+
+    public Controller() {
+        this.currentSortValue = sortValues[0];
+    }
+
     public Table loadSheet(Sheet sheet) {
         this.original = new Table(StreamSupport
                 .stream(sheet.spliterator(), false)
@@ -16,8 +25,12 @@ public class Controller {
         return new Table(this.original);
     }
 
-    // TODO
-    public void sort(String fieldName) {
-        this.modified = this.original.getSorted(0 /* fixme */);
+    public void sort(String field) {
+        this.modified = switch (this.currentSortValue) {
+            case UNSORTED -> this.original.getSorted(field, false);
+            case ASC -> this.original.getSorted(field, true);
+            case DESC -> new Table(this.original);
+        };
+        this.currentSortValue = sortValues[(this.currentSortValue.ordinal() + 1) % sortValues.length];
     }
 }

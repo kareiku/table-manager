@@ -1,6 +1,7 @@
 package org.example;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 public class Table {
     private final String[][] table;
@@ -20,13 +21,29 @@ public class Table {
         return this.table;
     }
 
-    // TODO
-    public Table getSorted(int fieldNumber) {
+    public Table getSorted(String field, boolean desc) {
+        int fieldIndex = -1;
+        int currentFieldIndex = 0;
+        for (String[] column : this.table) {
+            if (column[0].equals(field)) {
+                fieldIndex = currentFieldIndex;
+            }
+            currentFieldIndex++;
+        }
+        if (fieldIndex != -1) {
+            Table sorted = new Table(this.table);
+            if (desc) {
+                Arrays.sort(sorted.table[fieldIndex], Collections.reverseOrder());
+            } else {
+                Arrays.sort(sorted.table[fieldIndex]);
+            }
+            return sorted;
+        }
         return null;
     }
 
     // TODO
-    public Table getFiltered(int fieldNumber) {
+    public Table getFiltered(String field) {
         return null;
     }
 }

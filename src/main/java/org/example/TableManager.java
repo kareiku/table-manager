@@ -1,6 +1,9 @@
 package org.example;
 
 import javafx.application.Application;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -26,7 +29,7 @@ public final class TableManager extends Application {
     private ComboBox<String> secondFilteringColumn;
     private TextField secondFilteringField;
     private ComboBox<String> sortingColumn;
-    private TableView<Map<String, String>> tableView;
+    private TableView<String[]> tableView;
 
     private boolean sortAscending = true;
 
@@ -95,90 +98,6 @@ public final class TableManager extends Application {
     }
 
     /*
-    private void openFile(Stage stage) {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle(LANG.get(Language.Key.SelectFile));
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(LANG.get(Language.Key.ExcelFiles), "*.xls", "*.xlsx", "*.xlsm"));
-        File file = fileChooser.showOpenDialog(stage);
-
-        if (file != null) {
-            try (FileInputStream fis = new FileInputStream(file)) {
-                Workbook workbook;
-                if (file.getName().endsWith(".xlsx") || file.getName().endsWith(".xlsm")) {
-                    workbook = new XSSFWorkbook(fis);
-                } else if (file.getName().endsWith(".xls")) {
-                    workbook = new HSSFWorkbook(fis);
-                } else {
-                    throw new IllegalArgumentException("Unsupported file format");
-                }
-
-                List<String> sheetNames = new ArrayList<>();
-                for (Sheet sheet : workbook) {
-                    sheetNames.add(sheet.getSheetName());
-                }
-
-                ChoiceDialog<String> sheetDialog = new ChoiceDialog<>(sheetNames.get(0), sheetNames);
-                sheetDialog.setTitle(LANG.get(Language.Key.Title));
-                sheetDialog.setHeaderText(null);
-                sheetDialog.setContentText(LANG.get(Language.Key.SelectSheet));
-
-                Optional<String> sheet = sheetDialog.showAndWait();
-                sheet.ifPresent(sheetName -> this.loadSheet(workbook.getSheet(sheetName)));
-
-            } catch (IOException | IllegalArgumentException ex) {
-                this.showAlert(LANG.get(Language.Key.OpenError));
-            }
-        }
-    }
-
-    private void loadSheet(Sheet sheet) {
-        this.tableData = new ArrayList<>();
-        this.tableView.getColumns().clear();
-
-        Row headerRow = sheet.getRow(0);
-        if (headerRow == null) return;
-
-        List<String> headers = new ArrayList<>();
-        for (Cell cell : headerRow) {
-            String header = cell != null ? cell.getStringCellValue() : "";
-            headers.add(header);
-            TableColumn<Map<String, String>, String> column = new TableColumn<>(header);
-            column.setCellValueFactory(new PropertyValueFactory<>(header));
-            this.tableView.getColumns().add(column);
-        }
-
-        for (int i = 1; i <= sheet.getLastRowNum(); i++) {
-            Row row = sheet.getRow(i);
-            if (row != null) {
-                Map<String, String> rowData = new HashMap<>();
-                for (int j = 0; j < headers.size(); j++) {
-                    Cell cell = row.getCell(j);
-                    String value = this.getCellValue(cell);
-                    rowData.put(headers.get(j), value);
-                }
-                this.tableData.add(rowData);
-            }
-        }
-
-        this.tableView.setItems(FXCollections.observableArrayList(this.tableData));
-
-        this.firstFilteringColumn.setItems(FXCollections.observableArrayList(headers));
-        this.secondFilteringColumn.setItems(FXCollections.observableArrayList(headers));
-        this.sortingColumn.setItems(FXCollections.observableArrayList(headers));
-    }
-
-    private String getCellValue(Cell cell) {
-        if (cell == null) return "";
-        return switch (cell.getCellType()) {
-            case STRING -> cell.getStringCellValue();
-            case NUMERIC -> DateUtil.isCellDateFormatted(cell)
-                    ? new SimpleDateFormat("dd-MM-yyyy").format(cell.getDateCellValue())
-                    : String.valueOf(cell.getNumericCellValue());
-            case BOOLEAN -> String.valueOf(cell.getBooleanCellValue());
-            default -> "";
-        };
-    }
-
     private void filterTable() {
         if (this.tableData == null) return;
 
@@ -289,11 +208,21 @@ public final class TableManager extends Application {
         File file = this.chooseOpenFile();
         try (Workbook workbook = WorkbookFactory.create(file)) {
             Sheet sheet = this.chooseSheet(workbook);
-            Table table = this.controller.loadSheet(sheet);
-            for (String[] a : table.table()) {
-                for (String s : a) {
-                }
-            }
+            String[][] table = this.controller.loadSheet(sheet).table();
+
+            ObservableList<String[]> data = FXCollections.observableList(Arrays.asList(table));
+            // this.tableView.setItems(data);
+
+            data.forEach(column -> new TableColumn<String[], String>(column[0])
+                    .setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue()[0]))
+            );
+
+            /*
+            TableColumn<String[], String> c1 = new TableColumn<>("c1");
+            c1.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue()[0]));
+            this.tableView.getColumns().add(c1);
+             */
+
         } catch (Exception ignore) {
         }
     }
