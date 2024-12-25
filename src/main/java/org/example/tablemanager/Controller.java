@@ -1,23 +1,16 @@
 package org.example.tablemanager;
 
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.Sheet;
 
-import java.io.File;
+import java.util.stream.StreamSupport;
 
 public class Controller {
-    private static Controller controller;
+    private Table table;
 
-    private Controller() {
-    }
-
-    public static Controller getInstance() {
-        if (controller == null) {
-            controller = new Controller();
-        }
-        return controller;
-    }
-
-    public Workbook getWorkbook(File file) {
-        return null; // TODO
+    public void loadSheet(Sheet sheet) {
+        this.table = new Table(StreamSupport
+                .stream(sheet.spliterator(), false)
+                .map(row -> StreamSupport.stream(row.spliterator(), false).map(Object::toString).toArray(String[]::new))
+                .toList().toArray(String[][]::new));
     }
 }

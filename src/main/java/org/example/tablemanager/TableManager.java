@@ -12,16 +12,15 @@ import javafx.stage.Stage;
 import org.apache.poi.ss.usermodel.*;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.StreamSupport;
 
 public class TableManager extends Application {
     private static final Language LANG = Language.en_US;
+    private final Controller controller = new Controller();
+
     private TableView<Map<String, String>> tableView;
     private ComboBox<String> firstFilteringColumn;
     private ComboBox<String> secondFilteringColumn;
@@ -45,7 +44,7 @@ public class TableManager extends Application {
         BorderPane root = new BorderPane();
 
         MenuItem openItem = new MenuItem(LANG.get(Language.Key.OpenFile));
-        openItem.setOnAction(ignored -> this.table.openFile(stage));
+        openItem.setOnAction(ignored -> this.openFile(stage));
 
         MenuItem exportItem = new MenuItem(LANG.get(Language.Key.ExportFile));
         exportItem.setOnAction(ignored -> this.exportFilteredData(stage));
@@ -262,12 +261,6 @@ public class TableManager extends Application {
         alert.showAndWait();
     }
 
-    private void openFile(Stage stage) {
-        File file = this.chooseFile(stage);
-        Workbook workbook = Controller.getInstance().getWorkbook(file);
-        Sheet sheet = this.chooseSheet(workbook);
-    }
-
     private File chooseFile(Stage stage) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle(LANG.get(Language.Key.SelectFile));
@@ -283,8 +276,17 @@ public class TableManager extends Application {
         sheetDialog.setTitle(LANG.get(Language.Key.Title));
         sheetDialog.setHeaderText(null);
         sheetDialog.setContentText(LANG.get(Language.Key.SelectSheet));
-        Optional<String> sheetNameOptional = sheetDialog.showAndWait();
 
+        Optional<String> sheetNameOptional = sheetDialog.showAndWait();
         return sheetNameOptional.map(workbook::getSheet).orElse(null);
+    }
+
+    private void openFile(Stage stage) {
+        File file = this.chooseFile(stage);
+        try (Workbook workbook = WorkbookFactory.create(file)) {
+            Sheet sheet = this.chooseSheet(workbook);
+            this.controller.loadSheet(sheet);
+        } catch (Exception ignore) {
+        }
     }
 }
