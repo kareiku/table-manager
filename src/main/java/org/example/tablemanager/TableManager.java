@@ -57,25 +57,25 @@ public final class TableManager extends Application {
 
         ComboBox<String> firstFilteringColumn = new ComboBox<>();
         firstFilteringColumn.setPromptText(LANG.get(Language.Key.ColumnSelectPlaceholder));
-        firstFilteringColumn.setMaxWidth(140);
+        firstFilteringColumn.setPrefWidth(140);
 
         TextField firstFilteringField = new TextField();
         firstFilteringField.setPromptText(LANG.get(Language.Key.FilterPlaceholder));
-        firstFilteringField.setMaxWidth(150);
+        firstFilteringField.setPrefWidth(150);
         firstFilteringField.textProperty().addListener((ignored0, ignored1, ignored2) -> this.filterTable());
 
         ComboBox<String> secondFilteringColumn = new ComboBox<>();
         secondFilteringColumn.setPromptText(LANG.get(Language.Key.ColumnSelectPlaceholder));
-        secondFilteringColumn.setMaxWidth(140);
+        secondFilteringColumn.setPrefWidth(140);
 
         TextField secondFilteringField = new TextField();
         secondFilteringField.setPromptText(LANG.get(Language.Key.FilterPlaceholder));
-        secondFilteringField.setMaxWidth(150);
+        secondFilteringField.setPrefWidth(150);
         secondFilteringField.textProperty().addListener((ignored0, ignored1, ignored2) -> this.filterTable());
 
         ComboBox<String> sortingColumn = new ComboBox<>();
         sortingColumn.setPromptText(LANG.get(Language.Key.SortPlaceholder));
-        sortingColumn.setMaxWidth(130);
+        sortingColumn.setPrefWidth(130);
         sortingColumn.setOnAction(ignored -> this.sortTable());
 
         controls.getChildren().addAll(firstFilteringColumn, firstFilteringField, secondFilteringColumn, secondFilteringField, sortingColumn);
