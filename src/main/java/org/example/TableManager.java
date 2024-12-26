@@ -19,6 +19,7 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
 
 import java.io.File;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public final class TableManager extends Application {
     private static final Language LANG = Language.en_US;
@@ -29,7 +30,6 @@ public final class TableManager extends Application {
     private TextField firstFilteringField;
     private ComboBox<String> secondFilteringColumn;
     private TextField secondFilteringField;
-    private ComboBox<String> sortingColumn;
     private TableView<ObservableList<String>> tableView;
 
     public static void main(String[] args) {
@@ -79,12 +79,7 @@ public final class TableManager extends Application {
         this.secondFilteringField.setPrefWidth(150);
         this.secondFilteringField.textProperty().addListener((ignored0, ignored1, ignored2) -> System.nanoTime());
 
-        this.sortingColumn = new ComboBox<>();
-        this.sortingColumn.setPromptText(LANG.get(Language.Key.SortPlaceholder));
-        this.sortingColumn.setPrefWidth(130);
-        this.sortingColumn.setOnAction(ignored -> System.nanoTime());
-
-        controls.getChildren().addAll(this.firstFilteringColumn, this.firstFilteringField, this.secondFilteringColumn, this.secondFilteringField, this.sortingColumn);
+        controls.getChildren().addAll(this.firstFilteringColumn, this.firstFilteringField, this.secondFilteringColumn, this.secondFilteringField);
         root.setCenter(controls);
 
         this.tableView = new TableView<>();
@@ -118,19 +113,6 @@ public final class TableManager extends Application {
         }).collect(Collectors.toList());
 
         this.tableView.setItems(FXCollections.observableArrayList(filteredData));
-    }
-
-    private void sortTable() {
-        if (this.tableData == null) return;
-
-        String column = this.sortingColumn.getValue();
-        if (column == null) return;
-
-        this.tableData.sort(Comparator.comparing(row -> row.getOrDefault(column, ""), Comparator.nullsLast(String::compareTo)));
-        if (!this.sortAscending) Collections.reverse(this.tableData);
-        this.sortAscending = !this.sortAscending;
-
-        this.tableView.setItems(FXCollections.observableArrayList(this.tableData));
     }
 
     private void exportFilteredData(Stage stage) {
@@ -207,16 +189,12 @@ public final class TableManager extends Application {
         File file = this.chooseOpenFile();
         try (Workbook workbook = WorkbookFactory.create(file)) {
             Sheet sheet = this.chooseSheet(workbook);
-            List<List<String>> excelData = this.controller.loadSheet(sheet).toList();
-
+            this.tableView.getItems().clear();
+            this.tableView.getColumns().clear();
+            List<List<String>> excelData = this.controller.loadSheet(sheet);
             ObservableList<ObservableList<String>> data = FXCollections.observableArrayList();
-
-            for (List<String> excelDatum : excelData) {
-                data.add(FXCollections.observableArrayList(excelDatum));
-            }
-
-            this.tableView.setItems(data);
-
+            excelData.forEach(excelDatum -> data.add(FXCollections.observableArrayList(excelDatum)));
+            this.tableView.setItems(data.stream().skip(1).collect(Collectors.toCollection(FXCollections::observableArrayList)));
             for (int i = 0; i < excelData.get(0).size(); i++) {
                 int currentColumn = i;
                 TableColumn<ObservableList<String>, String> column = new TableColumn<>(data.get(0).get(i));
