@@ -3,10 +3,7 @@ package org.example;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ChoiceDialog;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.apache.poi.ss.usermodel.Row;
@@ -21,13 +18,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Controller {
-    private record Filter(int columnIndex, String value) {
+    private record Huh(int columnIndex, String value) {
     }
 
     private final Language language;
     private final TableView<ObservableList<String>> tableView;
     private final ObservableList<ObservableList<String>> data;
-    private final List<Filter> filterValues;
+    private final List<Huh> filterValues;
 
     public Controller(Language language, TableView<ObservableList<String>> tableView) {
         this.language = language;
@@ -127,13 +124,13 @@ public class Controller {
             }
         }
     }
-
+/*
     public void setFilterColumn(int filterIndex, String columnName) {
         int columnIndex = this.getFilterColumnIndex(columnName);
-        Filter filter = this.filterValues.get(filterIndex);
+        Huh filter = this.filterValues.get(filterIndex);
         String value = filter == null ? "" : filter.value;
         if (columnIndex >= 0) {
-            this.filterValues.set(filterIndex, new Filter(columnIndex, value));
+            this.filterValues.set(filterIndex, new Huh(columnIndex, value));
         }
     }
 
@@ -151,7 +148,7 @@ public class Controller {
     }
 
     public void setFilterValue(int filterIndex, String value) {
-        this.filterValues.set(filterIndex, new Filter(-1, value));
+        this.filterValues.set(filterIndex, new Huh(-1, value));
     }
 
     public void filter() {
@@ -166,4 +163,37 @@ public class Controller {
             }).collect(Collectors.toCollection(FXCollections::observableArrayList)));
         }
     }
+
+    public void setFilteringValue(int filterIndex, String value) {
+        this.filterValues.set(filterIndex, new Huh(this.filterValues.get(filterIndex).columnIndex, value));
+    }
+
+    public void createFilter() {
+        Integer columnIndex = this.getColumn();
+        System.out.println(columnIndex);
+    }
+
+    private Integer getColumn() {
+        Dialog<Integer> dialog = new Dialog<>();
+        dialog.setTitle(this.language.get(Language.Key.Title));
+        dialog.setHeaderText(this.language.get(Language.Key.ColumnSelectPlaceholder));
+
+        ComboBox<String> comboBox = new ComboBox<>();
+        this.tableView.getColumns().forEach(column -> comboBox.getItems().add(column.getText()));
+
+        dialog.getDialogPane().setContent(comboBox);
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL, ButtonType.OK);
+
+        Optional<Integer> v = dialog.showAndWait();
+
+        dialog.setResultConverter(button -> {
+            if (button == ButtonType.OK) {
+                int selectedIndex = comboBox.getSelectionModel().getSelectedIndex();
+                return selectedIndex >= 0 ? selectedIndex : null;
+            }
+            return null;
+        });
+        return null;
+    }
+*/
 }

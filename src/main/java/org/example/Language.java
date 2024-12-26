@@ -17,7 +17,8 @@ public enum Language {
             Map.entry(Key.OpenError, "Error when opening selected file."),
             Map.entry(Key.ExportError, "Error when exporting filtered data."),
             Map.entry(Key.SaveFile, "Save file as"),
-            Map.entry(Key.FilteredDataSheetName, "Filtered Data")
+            Map.entry(Key.FilteredDataSheetName, "Filtered Data"),
+            Map.entry(Key.NewFilter, "Create a new filter")
     )),
     es_ES(Map.ofEntries(
             Map.entry(Key.Title, "Gestor de tablas Excel"),
@@ -33,7 +34,8 @@ public enum Language {
             Map.entry(Key.OpenError, "Error al abrir el archivo seleccionado."),
             Map.entry(Key.ExportError, "Error al exportar los datos filtrados."),
             Map.entry(Key.SaveFile, "Guardar como"),
-            Map.entry(Key.FilteredDataSheetName, "Datos Filtrados")
+            Map.entry(Key.FilteredDataSheetName, "Datos Filtrados"),
+            Map.entry(Key.NewFilter, "Crear un nuevo filtro")
     ));
 
     private final Map<Key, String> messages;
@@ -60,6 +62,7 @@ public enum Language {
         OpenError,
         ExportError,
         SaveFile,
-        FilteredDataSheetName
+        FilteredDataSheetName,
+        NewFilter
     }
 }
