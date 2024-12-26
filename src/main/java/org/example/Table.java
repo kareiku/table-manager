@@ -1,44 +1,55 @@
 package org.example;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.List;
 
 public class Table {
-    private final String[][] table;
+    private final List<List<String>> rows;
 
-    public Table(String[][] table) {
-        this.table = table;
+    private Table() {
+        this.rows = new ArrayList<>();
+    }
+
+    @SafeVarargs
+    public Table(List<String>... rows) {
+        this();
+        this.rows.addAll(Arrays.asList(rows));
+    }
+
+    public Table(List<List<String>> rows) {
+        this();
+        this.rows.addAll(rows);
     }
 
     public Table(Table table) {
-        this.table = new String[table.table.length][];
-        for (int i = 0; i < table.table.length; i++) {
-            this.table[i] = Arrays.copyOf(table.table[i], table.table[i].length);
-        }
+        this();
+        this.rows.addAll(table.rows);
     }
 
-    public String[][] table() {
-        return this.table;
+    public List<List<String>> toList() {
+        return new ArrayList<>(this.rows);
     }
 
+    // fixme
     public Table getSorted(String field, boolean desc) {
-        int fieldIndex = -1;
-        int currentFieldIndex = 0;
-        for (String[] column : this.table) {
-            if (column[0].equals(field)) {
-                fieldIndex = currentFieldIndex;
-            }
-            currentFieldIndex++;
-        }
-        if (fieldIndex != -1) {
-            Table sorted = new Table(this.table);
-            if (desc) {
-                Arrays.sort(sorted.table[fieldIndex], Collections.reverseOrder());
-            } else {
-                Arrays.sort(sorted.table[fieldIndex]);
-            }
-            return sorted;
-        }
+//        int fieldIndex = -1;
+//        int currentFieldIndex = 0;
+//        for (StringProperty[] column : this.table) {
+//            if (column[0].getName().equals(field)) {
+//                fieldIndex = currentFieldIndex;
+//            }
+//            currentFieldIndex++;
+//        }
+//        if (fieldIndex != -1) {
+//            Table sorted = new Table(this);
+//            if (desc) {
+//                Arrays.sort(sorted.table[fieldIndex], Collections.reverseOrder());
+//            } else {
+//                Arrays.sort(sorted.table[fieldIndex]);
+//            }
+//            return sorted;
+//        }
         return null;
     }
 

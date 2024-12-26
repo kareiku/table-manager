@@ -1,6 +1,7 @@
 package org.example;
 
 import javafx.application.Application;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -29,9 +30,7 @@ public final class TableManager extends Application {
     private ComboBox<String> secondFilteringColumn;
     private TextField secondFilteringField;
     private ComboBox<String> sortingColumn;
-    private TableView<String[]> tableView;
-
-    private boolean sortAscending = true;
+    private TableView<ObservableList<String>> tableView;
 
     public static void main(String[] args) {
         TableManager.launch(args);
@@ -69,7 +68,7 @@ public final class TableManager extends Application {
         this.firstFilteringField = new TextField();
         this.firstFilteringField.setPromptText(LANG.get(Language.Key.FilterPlaceholder));
         this.firstFilteringField.setPrefWidth(150);
-        this.firstFilteringField.textProperty().addListener((ignored0, ignored1, ignored2) -> System.console());
+        this.firstFilteringField.textProperty().addListener((ignored0, ignored1, ignored2) -> System.nanoTime());
 
         this.secondFilteringColumn = new ComboBox<>();
         this.secondFilteringColumn.setPromptText(LANG.get(Language.Key.ColumnSelectPlaceholder));
@@ -78,12 +77,12 @@ public final class TableManager extends Application {
         this.secondFilteringField = new TextField();
         this.secondFilteringField.setPromptText(LANG.get(Language.Key.FilterPlaceholder));
         this.secondFilteringField.setPrefWidth(150);
-        this.secondFilteringField.textProperty().addListener((ignored0, ignored1, ignored2) -> System.console());
+        this.secondFilteringField.textProperty().addListener((ignored0, ignored1, ignored2) -> System.nanoTime());
 
         this.sortingColumn = new ComboBox<>();
         this.sortingColumn.setPromptText(LANG.get(Language.Key.SortPlaceholder));
         this.sortingColumn.setPrefWidth(130);
-        this.sortingColumn.setOnAction(ignored -> System.console());
+        this.sortingColumn.setOnAction(ignored -> System.nanoTime());
 
         controls.getChildren().addAll(this.firstFilteringColumn, this.firstFilteringField, this.secondFilteringColumn, this.secondFilteringField, this.sortingColumn);
         root.setCenter(controls);
@@ -208,21 +207,22 @@ public final class TableManager extends Application {
         File file = this.chooseOpenFile();
         try (Workbook workbook = WorkbookFactory.create(file)) {
             Sheet sheet = this.chooseSheet(workbook);
-            String[][] table = this.controller.loadSheet(sheet).table();
+            List<List<String>> excelData = this.controller.loadSheet(sheet).toList();
 
-            ObservableList<String[]> data = FXCollections.observableList(Arrays.asList(table));
-            // this.tableView.setItems(data);
+            ObservableList<ObservableList<String>> data = FXCollections.observableArrayList();
 
-            data.forEach(column -> new TableColumn<String[], String>(column[0])
-                    .setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue()[0]))
-            );
+            for (List<String> excelDatum : excelData) {
+                data.add(FXCollections.observableArrayList(excelDatum));
+            }
 
-            /*
-            TableColumn<String[], String> c1 = new TableColumn<>("c1");
-            c1.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue()[0]));
-            this.tableView.getColumns().add(c1);
-             */
+            this.tableView.setItems(data);
 
+            for (int i = 0; i < excelData.get(0).size(); i++) {
+                int currentColumn = i;
+                TableColumn<ObservableList<String>, String> column = new TableColumn<>(data.get(0).get(i));
+                column.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().get(currentColumn)));
+                this.tableView.getColumns().add(column);
+            }
         } catch (Exception ignore) {
         }
     }

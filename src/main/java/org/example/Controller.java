@@ -2,7 +2,8 @@ package org.example;
 
 import org.apache.poi.ss.usermodel.Sheet;
 
-import java.util.stream.StreamSupport;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Controller {
     private Table original;
@@ -13,15 +14,15 @@ public class Controller {
     private static final SortValue[] sortValues = SortValue.values();
     private SortValue currentSortValue;
 
-    public Controller() {
-        this.currentSortValue = sortValues[0];
-    }
-
     public Table loadSheet(Sheet sheet) {
-        this.original = new Table(StreamSupport
-                .stream(sheet.spliterator(), false)
-                .map(row -> StreamSupport.stream(row.spliterator(), false).map(Object::toString).toArray(String[]::new))
-                .toList().toArray(String[][]::new));
+        this.currentSortValue = sortValues[0];
+        List<List<String>> rows = new ArrayList<>();
+        sheet.forEach(row -> {
+            List<String> cells = new ArrayList<>();
+            row.forEach(cell -> cells.add(cell.toString()));
+            rows.add(cells);
+        });
+        this.original = new Table(rows);
         return new Table(this.original);
     }
 
