@@ -104,7 +104,7 @@ public class TableManager {
         fileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
         fileChooser.setMultiSelectionEnabled(false);
         fileChooser.setDialogTitle(LANG.get(Language.Key.SelectFile));
-        fileChooser.setFileFilter(new FileNameExtensionFilter(LANG.get(Language.Key.ExcelFiles) + " (*.xls;*.xlsx;*.xslm)", "xls", "xlsx", "xlsm"));
+        fileChooser.setFileFilter(new FileNameExtensionFilter(LANG.get(Language.Key.ExcelFiles) + " (*.xls;*.xlsx;*.xlsm)", "xls", "xlsx", "xlsm"));
         return fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION ? fileChooser.getSelectedFile() : null;
     }
 
