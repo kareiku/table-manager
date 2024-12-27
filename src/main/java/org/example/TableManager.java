@@ -16,7 +16,7 @@ import java.util.Vector;
 import java.util.stream.Collectors;
 
 public class TableManager {
-    private static final Language LANG = Language.es_ES;
+    private static final Language LANG = Language.en_US;
     private static final JComboBox<String> columns = new JComboBox<>();
     private static final JTextField filter = new JTextField(20);
     private static JTable table;
