@@ -7,6 +7,23 @@
     <groupId>org.example</groupId>
     <artifactId>table-manager</artifactId>
     <version>1.0</version>
+    <packaging>jar</packaging>
+
+    <name>table-manager</name>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://opensource.org/license/mit</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Kare</name>
+            <id>kareiku</id>
+        </developer>
+    </developers>
 
     <dependencies>
         <dependency>
